@@ -5,9 +5,29 @@
 [![License](https://img.shields.io/packagist/l/romanzipp/Laravel-Projectable-Aggregates.svg?style=flat-square)](https://packagist.org/packages/romanzipp/laravel-projectable-aggregates)
 [![GitHub Build Status](https://img.shields.io/github/actions/workflow/status/romanzipp/Laravel-Projectable-Aggregates/tests.yml?branch=master&style=flat-square)](https://github.com/romanzipp/Laravel-Projectable-Aggregates/actions)
 
+## What
+
+Laravel Projectable Aggregates is a package that allows you to **easily storage aggregate values like counts, sums, averages**, etc. in your models eliminating the need to **calculate these values on the fly** (with `withCount`, `withStum`, `withAvg`, etc.).
+
 ## Installation
 
+```bash
+composer require romanzipp/laravel-projectable-aggregates
+```
+
 ## Usage
+
+### Terminology
+
+#### Consumers 🟢
+
+Consumers hold the projectable aggregate database field. This is the model which otherwise would calculate the relationship fields via `withCount`, `withStum`, `withAvg`, etc.
+
+#### Providers 🔵
+
+Providing models provide (duh) the aggregate values for the consumer. Think of the provider to exist many times for one consumer.
+
+![](art/diagram.png)
 
 ## Testing
 
