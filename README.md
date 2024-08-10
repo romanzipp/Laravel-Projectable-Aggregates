@@ -125,12 +125,12 @@ There are three types of aggregates that can be calculated:
 - `ProjectionAggregateType::TYPE_AVG`: Averages the related models' values.
 
 > [!IMPORTANT]  
-> In order to use the aggregate types TYPE_SUM and TYPE_AVG, you need to specify the target attribute of the relationship.
+> In order to use the aggregate types `TYPE_SUM` and `TYPE_AVG`, you need to specify the target attribute of the relationship.
 > ```php
 > #[ProvidesProjectableAggregate(
 >     projectionAttribute: 'project_price_average',
 >     projectionType: ProjectionAggregateType::TYPE_AVG,
->     targetAttribute: 'price',
+>     targetAttribute: 'price',                          // <- Attribute of the related model to average/sum up
 > )]
 > ```
 
