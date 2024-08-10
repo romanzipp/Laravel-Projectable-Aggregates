@@ -103,10 +103,8 @@ use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(ProjectableAggregateRegistry $registry)
     {
-        $registry = app(ProjectableAggregateRegistry::class);
-
         $registry->registerConsumers([
             Car::class,
         ]);
