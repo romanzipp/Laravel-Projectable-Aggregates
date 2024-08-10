@@ -23,6 +23,6 @@ class ImplementationTest extends TestCase
         $this->expectExceptionMessage('Class romanzipp\ProjectableAggregates\Tests\Support\MissingInterfaceProvider must implement {ProvidesProjectableAttributesContract}');
 
         $registry = app(ProjectableAggregateRegistry::class);
-        $registry->registerProvider([MissingInterfaceProvider::class]);
+        $registry->registerProviders([MissingInterfaceProvider::class]);
     }
 }

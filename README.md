@@ -29,7 +29,7 @@ Providing models provide (duh) the aggregate values for the consumer. Think of t
 
 ## Usage
 
-Let's continue with the example of a `Car` model with `Door` models.
+Let's continue with the example of a `Car` model with `Door` models. We want to store the Doors count in the Car's `project_doors_count` field.
 
 ### 1. Add a Projection Field to DB
 
@@ -40,7 +40,7 @@ new class() extends Migration
     {
         Schema::create('cars', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('projection_doors_count')->default(0);
+            $table->unsignedInteger('project_doors_count')->default(0);
         });
     }
 }
@@ -49,6 +49,8 @@ new class() extends Migration
 ### 2. Update your Models
 
 #### 🟢 Car (Consumer)
+
+The consumer model will attach the [`ConsumesProjectableAggregate`](src/Attributes/ConsumesProjectableAggregate.php) attribute to the provider relation.
 
 ```php
 use romanzipp\ProjectableAggregates\Attributes\ConsumesProjectableAggregate;
@@ -69,6 +71,8 @@ class Car extends Model
 
 #### 🔵 Door (Provider)
 
+The provider model will attach the [`ProvidesProjectableAggregate`](src/Attributes/ProvidesProjectableAggregate.php) attribute to the consumer relation.
+
 ```php
 use romanzipp\ProjectableAggregates\Attributes\ProvidesProjectableAggregate;
 use romanzipp\ProjectableAggregates\ProjectionAggregateType;
@@ -85,6 +89,50 @@ class Door extends Model
     }
 }
 ```
+
+### 3. Register the Projection Aggregates
+
+In order to listen to model events issued by the provider models, you need to register the consumer models in the `boot` method of your `AppServiceProvider`.
+
+```php
+use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot()
+    {
+        $registry = app(ProjectableAggregateRegistry::class);
+
+        $registry->registerConsumers([
+            Car::class,
+        ]);
+
+        $registry->registerProviders([
+            Door::class,
+        ]);
+    }
+}
+```
+
+## Documentation
+
+### Aggregate Types
+
+There are three types of aggregates that can be calculated:
+
+- `ProjectionAggregateType::TYPE_COUNT`: Counts the number of related models.
+- `ProjectionAggregateType::TYPE_SUM`: Sums the related models' values.
+- `ProjectionAggregateType::TYPE_AVG`: Averages the related models' values.
+
+> [!IMPORTANT]  
+> In order to use the aggregate types TYPE_SUM and TYPE_AVG, you need to specify the target attribute of the relationship.
+> ```php
+> #[ProvidesProjectableAggregate(
+>     projectionAttribute: 'project_price_average',
+>     projectionType: ProjectionAggregateType::TYPE_AVG,
+>     targetAttribute: 'price',
+> )]
+> ```
 
 ## Testing
 

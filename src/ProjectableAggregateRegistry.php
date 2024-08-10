@@ -28,6 +28,11 @@ class ProjectableAggregateRegistry
      *--------------------------------------------------------------------------
      */
 
+    /**
+     * @param array<class-string> $consumerClasses
+     *
+     * @return void
+     */
     public function registerConsumers(array $consumerClasses): void
     {
         foreach ($consumerClasses as $consumerClass) {
@@ -52,8 +57,6 @@ class ProjectableAggregateRegistry
     }
 
     /**
-     * @throws \ReflectionException
-     *
      * @return \Generator<\romanzipp\ProjectableAggregates\ProjectableAggregateRelation>
      */
     public function discoverConsumingRelations(ProjectableAggregateContract $consumer): \Generator
@@ -86,7 +89,12 @@ class ProjectableAggregateRegistry
      *--------------------------------------------------------------------------
      */
 
-    public function registerProvider(array $providerClasses): void
+    /**
+     * @param array<class-string> $providerClasses
+     *
+     * @return void
+     */
+    public function registerProviders(array $providerClasses): void
     {
         foreach ($providerClasses as $providerClass) {
             $this->registerSingleProvider($providerClass);
@@ -252,9 +260,14 @@ class ProjectableAggregateRegistry
 
     private static function getAggregatedValue(ProjectableAggregateRelation $projectableRelation, Relation $relation): int
     {
+        if (null === $projectableRelation->targetAttribute && in_array($projectableRelation->projectionType, [ProjectionAggregateType::TYPE_SUM, ProjectionAggregateType::TYPE_AVG])) {
+            throw new \RuntimeException("Target attribute is required for projection type {$projectableRelation->projectionType}");
+        }
+
         return match ($projectableRelation->projectionType) {
             ProjectionAggregateType::TYPE_COUNT => $relation->count(),
-            ProjectionAggregateType::TYPE_SUM => $relation->sum(),
+            ProjectionAggregateType::TYPE_SUM => $relation->sum($projectableRelation->targetAttribute),
+            ProjectionAggregateType::TYPE_AVG => $relation->avg($projectableRelation->targetAttribute),
             default => throw new \RuntimeException("Unknown projection type {$projectableRelation->projectionType}"),
         };
     }

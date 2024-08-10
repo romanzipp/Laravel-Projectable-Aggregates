@@ -10,7 +10,8 @@ final readonly class ProjectableAggregateRelation
         public ProjectableAggregateContract $related,
         public string $relationName,
         public string $projectionAttribute,
-        public int $projectionType
+        public int $projectionType,
+        public ?string $targetAttribute = null,
     ) {
     }
 }

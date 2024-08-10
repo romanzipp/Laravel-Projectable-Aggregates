@@ -15,7 +15,7 @@ class ProjectFromModelEventsTest extends TestCase
     {
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([BasicConsumer::class]);
-        $registry->registerProvider([BasicProvider::class]);
+        $registry->registerProviders([BasicProvider::class]);
 
         $consumer = BasicConsumer::query()->create();
         $consumer->refresh();

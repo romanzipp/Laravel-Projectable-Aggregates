@@ -13,7 +13,7 @@ class ProjectFromBulkTest extends TestCase
     {
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([PivotConsumer::class]);
-        $registry->registerProvider([PivotProvider::class]);
+        $registry->registerProviders([PivotProvider::class]);
 
         $consumer = PivotConsumer::query()->create();
 

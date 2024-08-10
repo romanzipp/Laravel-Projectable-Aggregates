@@ -10,6 +10,7 @@ class ProvidesProjectableAggregate
     public function __construct(
         public string $projectionAttribute,
         public int $type = ProjectionAggregateType::TYPE_COUNT,
+        public ?string $targetAttribute = null,
     ) {
     }
 }
