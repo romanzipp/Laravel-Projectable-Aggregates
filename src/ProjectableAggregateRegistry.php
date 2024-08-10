@@ -177,7 +177,6 @@ class ProjectableAggregateRegistry
         $consumer->newQuery()->each(function (ConsumesProjectableAggregatesContract $consumer) {
             $updateDatabaseCallback = function () use ($consumer) {
                 foreach ($this->discoverConsumingRelations($consumer) as $projectableRelation) {
-                    // dd($projectableRelation);
                     $this->updateAggregateAttributes($projectableRelation);
                 }
             };
@@ -235,7 +234,6 @@ class ProjectableAggregateRegistry
         $relation = $projectableRelation->related->{$projectableRelation->relationName}();
 
         $updateDatabaseCallback = function () use ($relation, $projectableRelation, $countOffset) {
-            /** @phpstan-ignore-next-line */
             $relation
                 ->newQuery()
                 ->each(function ($consumer) use ($projectableRelation, $countOffset) {

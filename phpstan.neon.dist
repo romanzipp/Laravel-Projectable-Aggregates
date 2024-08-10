@@ -3,3 +3,5 @@ parameters:
   level: 6
   paths:
     - src
+  ignoreErrors:
+    - '#Illuminate\\Database\\Eloquent\\Relations\\Relation but does not specify its types#'

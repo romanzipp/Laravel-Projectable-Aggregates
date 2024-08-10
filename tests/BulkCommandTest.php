@@ -11,7 +11,7 @@ use romanzipp\ProjectableAggregates\Tests\Support\PivotProviderConsumerPivot;
 
 class BulkCommandTest extends TestCase
 {
-    public function testCommand()
+    public function testCommand(): void
     {
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([PivotConsumer::class]);
@@ -35,7 +35,7 @@ class BulkCommandTest extends TestCase
         self::assertSame(1, $consumer->projection_providers_count);
     }
 
-    public function testQueued()
+    public function testQueued(): void
     {
         $bus = Bus::fake();
 
@@ -46,7 +46,7 @@ class BulkCommandTest extends TestCase
         );
     }
 
-    public function testQueuedOnOtherQueue()
+    public function testQueuedOnOtherQueue(): void
     {
         $bus = Bus::fake();
 
