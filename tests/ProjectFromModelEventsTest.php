@@ -11,7 +11,7 @@ class ProjectFromModelEventsTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testProject(): void
+    public function testBasicModels(): void
     {
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([BasicConsumer::class]);

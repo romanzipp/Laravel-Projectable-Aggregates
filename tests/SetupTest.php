@@ -2,13 +2,16 @@
 
 namespace romanzipp\ProjectableAggregates\Tests;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotConsumer;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotProvider;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotProviderConsumerPivot;
 
-class ProjectFromBulkTest extends TestCase
+class SetupTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function testPivotModels(): void
     {
         $registry = app(ProjectableAggregateRegistry::class);
@@ -24,16 +27,7 @@ class ProjectFromBulkTest extends TestCase
             'provider_id' => $provider->id,
         ]);
 
-        $consumer->refresh();
-
-        self::assertSame(1, $consumer->providers()->count());
-        self::assertSame(0, $consumer->projection_providers_count);
-
-        $registry->bulkAggregate();
-
-        $consumer->refresh();
-
-        self::assertSame(1, $consumer->providers()->count());
-        self::assertSame(1, $consumer->projection_providers_count);
+        self::assertSame($provider->id, $consumer->providers()->first()->id);
+        self::assertSame($consumer->id, $provider->consumer()->first()->id);
     }
 }

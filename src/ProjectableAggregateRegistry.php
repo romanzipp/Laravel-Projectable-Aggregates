@@ -167,12 +167,18 @@ class ProjectableAggregateRegistry
     private function aggregateConsumer(ConsumesProjectableAggregatesContract $consumer): void
     {
         $consumer->newQuery()->each(function (ConsumesProjectableAggregatesContract $consumer) {
-            DB::transaction(function () use ($consumer) {
+            $updateDatabaseCallback = function () use ($consumer) {
                 foreach ($this->discoverConsumingRelations($consumer) as $projectableRelation) {
                     // dd($projectableRelation);
                     $this->updateAggregateAttributes($projectableRelation);
                 }
-            });
+            };
+
+            if (config('projectable-aggregates.use_transactions')) {
+                DB::transaction($updateDatabaseCallback);
+            } else {
+                $updateDatabaseCallback();
+            }
         });
     }
 
@@ -220,7 +226,7 @@ class ProjectableAggregateRegistry
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
         $relation = $projectableRelation->related->{$projectableRelation->relationName}();
 
-        DB::transaction(function () use ($relation, $projectableRelation, $countOffset) {
+        $updateDatabaseCallback = function () use ($relation, $projectableRelation, $countOffset) {
             /** @phpstan-ignore-next-line */
             $relation
                 ->newQuery()
@@ -229,7 +235,13 @@ class ProjectableAggregateRegistry
 
                     // dump('updating ' . $consumer::class . ' (' . $consumer->id . ') attribute (relation ' . $projectableRelation->relationName . ') ' . $projectableRelation->projectionAttribute . ' to ' . $aggregateValue);
                 });
-        });
+        };
+
+        if (config('projectable-aggregates.use_transactions')) {
+            DB::transaction($updateDatabaseCallback);
+        } else {
+            $updateDatabaseCallback();
+        }
     }
 
     /*
