@@ -7,7 +7,7 @@
 
 ## What
 
-Laravel Projectable Aggregates is a package that allows you to **easily storage aggregate values like counts, sums, averages**, etc. in your models eliminating the need to **calculate these values on the fly** (with `withCount`, `withStum`, `withAvg`, etc.).
+Laravel Projectable Aggregates is a package that allows you to **easily storage aggregate values like counts, sums, averages**, etc. in your models eliminating the need to **calculate these values on the fly** (with `withCount`, `withSum`, `withAvg`, etc.).
 
 - **Speed up database queries** by storing aggregate values in the database.
 - **Automatically updates** aggregate values with [Model Events](https://laravel.com/docs/events).
@@ -23,7 +23,7 @@ composer require romanzipp/laravel-projectable-aggregates
 
 #### 🟢 Consumers 
 
-Consumers hold the projectable aggregate database field. This is the model which otherwise would calculate the relationship fields via `withCount`, `withStum`, `withAvg`, etc.
+Consumers hold the projectable aggregate database field. This is the model which otherwise would calculate the relationship fields via `withCount`, `withSum`, `withAvg`, etc.
 
 #### 🔵 Providers
 
@@ -137,6 +137,20 @@ There are three types of aggregates that can be calculated:
 >     targetAttribute: 'price',                          // <- Attribute of the related model to average/sum up
 > )]
 > ```
+
+### Triggers
+
+You can decide if you would only like to rely on **models events** or if you want to calculate the aggregate values **periodically in bulk**.
+
+#### Rely on Model Events
+
+This will automatically work if your've attached the [`ProvidesProjectableAggregate`](src/Attributes/ProvidesProjectableAggregate.php) attribute to your provider relations. Once a provider model has been created/deleted the according consumer aggregate attribute will be incremented/decremented.
+
+#### Calculate periodically in Bulk
+
+```bash
+php artisan aggregates:bulk-aggregate {--queued} {--queue=}
+```
 
 ## Testing
 

@@ -5,9 +5,17 @@ namespace romanzipp\ProjectableAggregates\Tests;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Application;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use romanzipp\ProjectableAggregates\Providers\ProjectableAggregatesProvider;
 
 class TestCase extends BaseTestCase
 {
+    protected function getPackageProviders($app): array
+    {
+        return [
+            ProjectableAggregatesProvider::class,
+        ];
+    }
+
     public function setUp(): void
     {
         parent::setUp();

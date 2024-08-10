@@ -4,6 +4,7 @@ namespace romanzipp\ProjectableAggregates\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use romanzipp\ProjectableAggregates\Command\CalculateBulkAggregatesCommand;
 use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 
 class ProjectableAggregatesProvider extends ServiceProvider
@@ -13,6 +14,12 @@ class ProjectableAggregatesProvider extends ServiceProvider
         $this->publishes([
             dirname(__DIR__) . '/../config/projectable-aggregates.php' => config_path('projectable-aggregates.php'),
         ], 'config');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CalculateBulkAggregatesCommand::class,
+            ]);
+        }
     }
 
     public function register(): void
