@@ -15,19 +15,76 @@ Laravel Projectable Aggregates is a package that allows you to **easily storage 
 composer require romanzipp/laravel-projectable-aggregates
 ```
 
-## Usage
+## Terminology
 
-### Terminology
-
-#### Consumers 🟢
+#### 🟢 Consumers 
 
 Consumers hold the projectable aggregate database field. This is the model which otherwise would calculate the relationship fields via `withCount`, `withStum`, `withAvg`, etc.
 
-#### Providers 🔵
+#### 🔵 Providers
 
 Providing models provide (duh) the aggregate values for the consumer. Think of the provider to exist many times for one consumer.
 
 ![](art/diagram.png)
+
+## Usage
+
+Let's continue with the example of a `Car` model with `Door` models.
+
+### 1. Add a Projection Field to DB
+
+```php
+new class() extends Migration
+{
+    public function up()
+    {
+        Schema::create('cars', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('projection_doors_count')->default(0);
+        });
+    }
+}
+```
+
+### 2. Update your Models
+
+#### 🟢 Car (Consumer)
+
+```php
+use romanzipp\ProjectableAggregates\Attributes\ConsumesProjectableAggregate;
+use romanzipp\ProjectableAggregates\ProjectionAggregateType;
+
+class Car extends Model
+{
+    #[ConsumesProjectableAggregate(
+        projectionAttribute: 'project_doors_count',   // <- Name of the projection field in the database
+        projectionType: ProjectionAggregateType::TYPE_COUNT
+    )]
+    public function doors(): HasMany
+    {
+        return $this->hasMany(Door::class);
+    }
+}
+```
+
+#### 🔵 Door (Provider)
+
+```php
+use romanzipp\ProjectableAggregates\Attributes\ProvidesProjectableAggregate;
+use romanzipp\ProjectableAggregates\ProjectionAggregateType;
+
+class Door extends Model
+{
+    #[ProvidesProjectableAggregate(
+        projectionAttribute: 'project_doors_count',   // <- Name of the FOREIGN projection field in the database
+        projectionType: ProjectionAggregateType::TYPE_COUNT
+    )]
+    public function car(): BelongsTo
+    {
+        return $this->belongsTo(Car::class);
+    }
+}
+```
 
 ## Testing
 
