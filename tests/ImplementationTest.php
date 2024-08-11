@@ -11,7 +11,7 @@ class ImplementationTest extends TestCase
     public function testMissingConsumerInterface(): void
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Class romanzipp\ProjectableAggregates\Tests\Support\MissingInterfaceConsumer must implement {StoresProjectableAggregatesContract}');
+        $this->expectExceptionMessage('Class romanzipp\ProjectableAggregates\Tests\Support\MissingInterfaceConsumer must implement {ConsumesProjectableAggregatesContract}');
 
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([MissingInterfaceConsumer::class]);

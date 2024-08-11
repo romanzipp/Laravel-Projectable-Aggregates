@@ -8,6 +8,8 @@ use romanzipp\ProjectableAggregates\Events\UpdateProjectableAggregatesEvent;
 use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 use romanzipp\ProjectableAggregates\Tests\Support\BasicConsumer;
 use romanzipp\ProjectableAggregates\Tests\Support\BasicProvider;
+use romanzipp\ProjectableAggregates\Tests\Support\MorphBasicConsumer;
+use romanzipp\ProjectableAggregates\Tests\Support\MorphBasicProvider;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotConsumer;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotProvider;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotProviderConsumerPivot;
@@ -81,6 +83,37 @@ class ProjectFromModelEventsTest extends TestCase
         self::assertSame(1, $consumer->projection_providers_count);
 
         $events->assertDispatchedTimes(UpdateProjectableAggregatesEvent::class, 3);
+    }
+
+    /**
+     * Provider::morphTo() <-> Consumer::morphMany().
+     *
+     * @return void
+     */
+    public function testBasicMorphModels()
+    {
+        $events = Event::fake([UpdateProjectableAggregatesEvent::class]);
+
+        $registry = app(ProjectableAggregateRegistry::class);
+        $registry->registerConsumers([MorphBasicConsumer::class]);
+        $registry->registerProviders([MorphBasicProvider::class]);
+
+        $consumer = MorphBasicConsumer::query()->create();
+        $consumer->refresh();
+
+        self::assertSame(0, $consumer->projection_providers_count);
+
+        // Create a provider model
+
+        $providerOne = MorphBasicProvider::query()->create([
+            'consumer_id' => $consumer->id,
+            'consumer_type' => get_class($consumer),
+        ]);
+
+        $consumer->refresh();
+
+        self::assertSame(1, $consumer->providers()->count());
+        self::assertSame(1, $consumer->projection_providers_count);
     }
 
     /**

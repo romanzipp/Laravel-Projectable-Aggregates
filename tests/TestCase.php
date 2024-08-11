@@ -41,6 +41,18 @@ class TestCase extends BaseTestCase
             $table->bigInteger('consumer_id')->unsigned();
         });
 
+        // Basic-Morph: HasMany <-> BelongsTo
+
+        $app['db']->connection()->getSchemaBuilder()->create('basic_morph_consumers', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedInteger('projection_providers_count')->default(0);
+        });
+
+        $app['db']->connection()->getSchemaBuilder()->create('basic_morph_providers', function (Blueprint $table) {
+            $table->id();
+            $table->morphs('consumer');
+        });
+
         // Pivot: HasManyThrough <-> HasOneThrough
 
         $app['db']->connection()->getSchemaBuilder()->create('pivot_consumers', function (Blueprint $table) {

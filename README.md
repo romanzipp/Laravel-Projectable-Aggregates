@@ -171,6 +171,10 @@ The following relationships are supported and tested:
 - ❌ Model Events  
 - ✅ Bulk Aggregation
 
+#### [`Provider::morphTo()`](tests/Support/MorphBasicProvider.php) <-> [`Consumer::morphMany()`](tests/Support/MorphBasicConsumer.php)
+- ✅ Model Events
+- ✅ Bulk Aggregation
+
 ## Testing
 
 This repository contains a [Lando](https://lando.dev) configuration file that can be used to run the tests on your local machine.

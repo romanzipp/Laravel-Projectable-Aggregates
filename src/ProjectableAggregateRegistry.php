@@ -47,7 +47,7 @@ class ProjectableAggregateRegistry
         $reflectionInstance = $reflectionClass->newInstanceWithoutConstructor();
 
         if ( ! $reflectionInstance instanceof ConsumesProjectableAggregatesContract) {
-            throw new \RuntimeException("Class {$consumerClass} must implement {StoresProjectableAggregatesContract}");
+            throw new \RuntimeException("Class {$consumerClass} must implement {ConsumesProjectableAggregatesContract}");
         }
 
         if (in_array($consumerClass, $this->registeredProviderClasses)) {
@@ -144,7 +144,7 @@ class ProjectableAggregateRegistry
                 $consumer = $relation->getRelated();
 
                 if ( ! $consumer instanceof ConsumesProjectableAggregatesContract) {
-                    throw new \RuntimeException("Class {$reflectionClass->getName()} must implement {StoresProjectableAggregatesContract}");
+                    throw new \RuntimeException(sprintf('Class %s must implement {ConsumesProjectableAggregatesContract}', get_class($consumer)));
                 }
 
                 yield new ProjectableAggregateRelation(
