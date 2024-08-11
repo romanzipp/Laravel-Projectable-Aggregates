@@ -9,6 +9,7 @@ use romanzipp\ProjectableAggregates\Attributes\ProvidesProjectableAggregate;
 use romanzipp\ProjectableAggregates\Contracts\ConsumesProjectableAggregatesContract;
 use romanzipp\ProjectableAggregates\Contracts\ProjectableAggregateContract;
 use romanzipp\ProjectableAggregates\Contracts\ProvidesProjectableAggregatesContract;
+use romanzipp\ProjectableAggregates\Events\UpdateProjectableAggregatesEvent;
 
 class ProjectableAggregateRegistry
 {
@@ -74,10 +75,10 @@ class ProjectableAggregateRegistry
                 }
 
                 yield new ProjectableAggregateRelation(
-                    related: $consumer,
                     relationName: $reflectionMethod->getName(),
                     projectionAttribute: $projectionAttribute->projectionAttribute,
                     projectionType: $projectionAttribute->type,
+                    consumer: $consumer,
                 );
             }
         }
@@ -85,7 +86,7 @@ class ProjectableAggregateRegistry
 
     /*
      *--------------------------------------------------------------------------
-     * Related
+     * Providers
      *--------------------------------------------------------------------------
      */
 
@@ -125,7 +126,7 @@ class ProjectableAggregateRegistry
      *
      * @return \Generator<\romanzipp\ProjectableAggregates\ProjectableAggregateRelation>
      */
-    public function discoverProvidingRelations(ProjectableAggregateContract $provider): \Generator
+    public function discoverProvidingRelations(ProvidesProjectableAggregatesContract $provider): \Generator
     {
         $reflectionClass = new \ReflectionClass($provider);
         $reflectionMethods = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
@@ -147,10 +148,10 @@ class ProjectableAggregateRegistry
                 }
 
                 yield new ProjectableAggregateRelation(
-                    related: $provider,
                     relationName: $reflectionMethod->getName(),
                     projectionAttribute: $projectionAttribute->projectionAttribute,
                     projectionType: $projectionAttribute->type,
+                    provider: $provider,
                 );
             }
         }
@@ -192,13 +193,13 @@ class ProjectableAggregateRegistry
     private function updateAggregateAttributes(ProjectableAggregateRelation $projectableRelation): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-        $relation = $projectableRelation->related->{$projectableRelation->relationName}();
+        $relation = $projectableRelation->consumer->{$projectableRelation->relationName}();
 
         // Fetch the aggregated value to be stored in the projection attribute
 
         $aggregateValue = self::getAggregatedValue($projectableRelation, $relation);
 
-        $projectableRelation->related->update([
+        $projectableRelation->consumer->update([
             $projectableRelation->projectionAttribute => $aggregateValue,
         ]);
     }
@@ -231,13 +232,20 @@ class ProjectableAggregateRegistry
     private function adjustAggregateAttributes(ProjectableAggregateRelation $projectableRelation, int $countOffset): void
     {
         /** @var \Illuminate\Database\Eloquent\Relations\Relation $relation */
-        $relation = $projectableRelation->related->{$projectableRelation->relationName}();
+        $relation = $projectableRelation->provider->{$projectableRelation->relationName}();
 
         $updateDatabaseCallback = function () use ($relation, $projectableRelation, $countOffset) {
             $relation
                 ->newQuery()
                 ->each(function ($consumer) use ($projectableRelation, $countOffset) {
                     $consumer->increment($projectableRelation->projectionAttribute, $countOffset);
+
+                    event(
+                        new UpdateProjectableAggregatesEvent(
+                            provider: $projectableRelation->provider,
+                            consumer: $consumer,
+                        )
+                    );
 
                     // dump('updating ' . $consumer::class . ' (' . $consumer->id . ') attribute (relation ' . $projectableRelation->relationName . ') ' . $projectableRelation->projectionAttribute . ' to ' . $aggregateValue);
                 });
