@@ -2,6 +2,8 @@
 
 namespace romanzipp\ProjectableAggregates\Tests;
 
+use Illuminate\Support\Facades\Event;
+use romanzipp\ProjectableAggregates\Events\UpdateProjectableAggregatesEvent;
 use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotConsumer;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotProvider;
@@ -11,6 +13,8 @@ class ProjectFromBulkTest extends TestCase
 {
     public function testPivotModels(): void
     {
+        $events = Event::fake([UpdateProjectableAggregatesEvent::class]);
+
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([PivotConsumer::class]);
         $registry->registerProviders([PivotProvider::class]);
@@ -35,5 +39,7 @@ class ProjectFromBulkTest extends TestCase
 
         self::assertSame(1, $consumer->providers()->count());
         self::assertSame(1, $consumer->projection_providers_count);
+
+        $events->assertNotDispatched(UpdateProjectableAggregatesEvent::class);
     }
 }

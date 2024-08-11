@@ -3,6 +3,8 @@
 namespace romanzipp\ProjectableAggregates\Tests;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
+use romanzipp\ProjectableAggregates\Events\UpdateProjectableAggregatesEvent;
 use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 use romanzipp\ProjectableAggregates\Tests\Support\BasicConsumer;
 use romanzipp\ProjectableAggregates\Tests\Support\BasicProvider;
@@ -13,6 +15,8 @@ class ProjectFromModelEventsTest extends TestCase
 
     public function testBasicModels(): void
     {
+        $events = Event::fake([UpdateProjectableAggregatesEvent::class]);
+
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([BasicConsumer::class]);
         $registry->registerProviders([BasicProvider::class]);
@@ -52,5 +56,7 @@ class ProjectFromModelEventsTest extends TestCase
 
         self::assertSame(1, $consumer->providers()->count());
         self::assertSame(1, $consumer->projection_providers_count);
+
+        $events->assertDispatchedTimes(UpdateProjectableAggregatesEvent::class, 3);
     }
 }

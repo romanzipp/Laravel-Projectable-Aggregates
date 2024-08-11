@@ -3,6 +3,8 @@
 namespace romanzipp\ProjectableAggregates\Tests;
 
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
+use romanzipp\ProjectableAggregates\Events\UpdateProjectableAggregatesEvent;
 use romanzipp\ProjectableAggregates\Jobs\CalculateBulkAggregatesJob;
 use romanzipp\ProjectableAggregates\ProjectableAggregateRegistry;
 use romanzipp\ProjectableAggregates\Tests\Support\PivotConsumer;
@@ -13,6 +15,8 @@ class BulkCommandTest extends TestCase
 {
     public function testCommand(): void
     {
+        $events = Event::fake([UpdateProjectableAggregatesEvent::class]);
+
         $registry = app(ProjectableAggregateRegistry::class);
         $registry->registerConsumers([PivotConsumer::class]);
         $registry->registerProviders([PivotProvider::class]);
@@ -33,22 +37,25 @@ class BulkCommandTest extends TestCase
 
         self::assertSame(1, $consumer->providers()->count());
         self::assertSame(1, $consumer->projection_providers_count);
+
+        $events->assertNotDispatched(UpdateProjectableAggregatesEvent::class);
     }
 
     public function testQueued(): void
     {
         $bus = Bus::fake();
+        $events = Event::fake([UpdateProjectableAggregatesEvent::class]);
 
         $this->artisan('aggregates:bulk-aggregate --queued');
 
-        $bus->assertDispatched(
-            CalculateBulkAggregatesJob::class
-        );
+        $bus->assertDispatched(CalculateBulkAggregatesJob::class);
+        $events->assertNotDispatched(UpdateProjectableAggregatesEvent::class);
     }
 
     public function testQueuedOnOtherQueue(): void
     {
         $bus = Bus::fake();
+        $events = Event::fake([UpdateProjectableAggregatesEvent::class]);
 
         $this->artisan('aggregates:bulk-aggregate --queued --queue=foobar');
 
@@ -56,5 +63,6 @@ class BulkCommandTest extends TestCase
             CalculateBulkAggregatesJob::class,
             fn (CalculateBulkAggregatesJob $job) => 'foobar' === $job->queue
         );
+        $events->assertNotDispatched(UpdateProjectableAggregatesEvent::class);
     }
 }

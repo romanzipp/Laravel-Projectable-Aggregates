@@ -244,6 +244,10 @@ class ProjectableAggregateRegistry
                         new UpdateProjectableAggregatesEvent(
                             provider: $projectableRelation->provider,
                             consumer: $consumer,
+                            relationName: $projectableRelation->relationName,
+                            projectionAttribute: $projectableRelation->projectionAttribute,
+                            projectionType: $projectableRelation->projectionType,
+                            targetAttribute: $projectableRelation->targetAttribute,
                         )
                     );
 
