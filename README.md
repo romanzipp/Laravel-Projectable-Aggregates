@@ -7,7 +7,7 @@
 
 ## What
 
-Laravel Projectable Aggregates is a package that allows you to **easily storage aggregate values like counts, sums, averages**, etc. in your models eliminating the need to **calculate these values on the fly** (with `withCount`, `withSum`, `withAvg`, etc.).
+Laravel Projectable Aggregates is a package that allows you to **easily store aggregate values like counts, sums, averages**, etc. in your models eliminating the need to **calculate these values on the fly** (with `withCount`, `withSum`, `withAvg`, etc.).
 
 - **Speed up database queries** by storing aggregate values in the database.
 - **Automatically updates** aggregate values with [Model Events](https://laravel.com/docs/events).
