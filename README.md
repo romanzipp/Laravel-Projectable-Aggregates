@@ -163,8 +163,12 @@ php artisan aggregates:bulk-aggregate {--queued} {--queue=} {--class=}
 
 The following relationships are supported and tested:
 
-- [`Provider::belongsTo()`](tests/Support/BasicProvider.php) <-> [`Consumer::hasMany()`](tests/Support/BasicConsumer.php)
-- [`Provider::hasOneThrough()`](tests/Support/PivotProvider.php) <- `Pivot` -> [`Consumer::hasManyThrough()`](tests/Support/PivotConsumer.php) ⚠️ WIP
+- [`Provider::belongsTo()`](tests/Support/BasicProvider.php) <-> [`Consumer::hasMany()`](tests/Support/BasicConsumer.php)  
+  ✅ Model Events  
+  ✅ Bulk Aggregation
+- [`Provider::hasOneThrough()`](tests/Support/PivotProvider.php) <-> `Pivot` <-> [`Consumer::hasManyThrough()`](tests/Support/PivotConsumer.php) ⚠️ WIP  
+  ❌ Model Events  
+  ✅ Bulk Aggregation
 
 ## Testing
 
