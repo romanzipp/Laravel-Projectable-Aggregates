@@ -250,8 +250,6 @@ class ProjectableAggregateRegistry
                             targetAttribute: $projectableRelation->targetAttribute,
                         )
                     );
-
-                    // dump('updating ' . $consumer::class . ' (' . $consumer->id . ') attribute (relation ' . $projectableRelation->relationName . ') ' . $projectableRelation->projectionAttribute . ' to ' . $aggregateValue);
                 });
         };
 

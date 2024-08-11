@@ -118,6 +118,9 @@ class AppServiceProvider extends ServiceProvider
 
 ## Documentation
 
+> [!IMPORTANT]  
+> Calculating aggregate values (without bulk) **relies on Elouent model events** which are only dispatched when working with Eloquent model itself. Using the `DB` facade will **not trigger** the library to update the aggregate values.
+
 ### Aggregate Types
 
 There are three types of aggregates that can be calculated:
@@ -146,9 +149,22 @@ This will automatically work if your've attached the [`ProvidesProjectableAggreg
 
 #### Calculate periodically in Bulk
 
+If you don't want to or can't rely on model events, you can use the `bulk-aggregate` command to calculate the aggregate values periodically in bulk.
+
 ```bash
-php artisan aggregates:bulk-aggregate {--queued} {--queue=}
+php artisan aggregates:bulk-aggregate {--queued} {--queue=} {--class=}
 ```
+
+- `--queued`: Dispatch a job to the worker queue.
+- `--queue=`: Specify the queue to run the command in.
+- `--class=`: Limit the bulk calculation to a specific consumer class.
+
+### Relationships
+
+The following relationships are supported and tested:
+
+- [`Provider::belongsTo()`](tests/Support/BasicProvider.php) <-> [`Consumer::hasMany()`](tests/Support/BasicConsumer.php)
+- [`Provider::hasOneThrough()`](tests/Support/PivotProvider.php) <- `Pivot` -> [`Consumer::hasManyThrough()`](tests/Support/PivotConsumer.php) ⚠️ WIP
 
 ## Testing
 
