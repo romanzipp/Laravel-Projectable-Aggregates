@@ -15,7 +15,7 @@ final class CalculateBulkAggregatesJob
      * @param array<class-string> $consumerClasses
      */
     public function __construct(
-        public array $consumerClasses = []
+        public array $consumerClasses = [],
     ) {
     }
 
